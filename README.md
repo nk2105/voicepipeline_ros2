@@ -13,9 +13,6 @@ Ensure that you have ROS 2 installed on your system. You can follow the official
 Create a `requirements.txt` file in the root directory of your project and list the required Python packages:
 
 ```plaintext
-rclpy
 whisper
-numpy
 sounddevice
-scipy
 
