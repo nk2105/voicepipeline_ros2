@@ -1,4 +1,4 @@
-# voivepipeline_ros2
+# voicepipeline_ros2
 
 This project uses ROS 2 and various Python packages for real-time communication and data processing. Below are the instructions for setting up the environment and installing dependencies.
 
