@@ -10,7 +10,7 @@ Ensure that you have ROS 2 installed on your system. You can follow the official
 
 ### 2. Python Dependencies
 
-Create a `requirements.txt` file in the root directory of your project and list the required Python packages:
+Install the following libraries:
 
 ```plaintext
 whisper
