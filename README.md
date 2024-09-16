@@ -1,6 +1,8 @@
 # voicepipeline_ros2
 
-This project uses ROS 2 and various Python packages for real-time communication and data processing. Below are the instructions for setting up the environment and installing dependencies.
+**VoicePipeline ROS2** is a ROS2-based project for real-time voice processing and command handling. It integrates various nodes for audio transcription and command execution using advanced machine learning models and ROS2 infrastructure.
+
+Below are the instructions for setting up the environment and installing dependencies.
 
 ## Installation
 
