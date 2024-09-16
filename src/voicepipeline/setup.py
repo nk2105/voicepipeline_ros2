@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import find_packages, setup
 
-package_name = 'ur_whisper'
+package_name = 'voicepipeline'
 
 setup(
     name=package_name,
@@ -26,11 +26,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'commander = ur_whisper.commander:main',
-            'transcriber = ur_whisper.transcriber:main',
-            'commander_gpt = ur_whisper.commander_gpt:main',
-            'spot_commander = ur_whisper.spot_commander:main',
-            'ur_moveit_motion = ur_whisper.ur_moveit_motion:main',
+            'commander = voicepipeline.commander:main',
+            'transcriber = voicepipeline.transcriber:main',
+            'commander_gpt = voicepipeline.commander_gpt:main',
+            'spot_commander = voicepipeline.spot_commander:main',
+            'moveit_motion = voicepipeline.moveit_motion:main',
         ],
     },
 )

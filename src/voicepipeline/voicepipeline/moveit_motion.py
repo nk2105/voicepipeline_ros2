@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import rclpy
+import rclpy.logging
 from rclpy.node import Node
 from moveit.planning import MoveItPy, MultiPipelinePlanRequestParameters
 from geometry_msgs.msg import Pose, PoseStamped, Twist
 import tf2_ros
 import transforms3d
-from tf2_geometry_msgs import do_transform_pose
 from moveit.core.robot_state import RobotState
 from std_msgs.msg import String
 
@@ -14,10 +14,13 @@ import math
 
 class URMoveItMotion(Node):
     def __init__(self):
-        super().__init__('ur_moveit_motion')
-        
-        self.moveit = MoveItPy("moveit_py")
-        self.arm = self.moveit.get_planning_component('ur_manipulator')
+        super().__init__('moveit_motion')
+        self.logger = rclpy.logging.get_logger("moveit_py.pose_goal")
+
+        self.moveit = MoveItPy(node_name="moveit_py")
+        self.arm = self.moveit.get_planning_component('manipulator')
+        self.gripper = self.moveit.get_planning_component('gripper')
+        self.logger.info("MoveItPy initialized")
 
         self.command_subscriber = self.create_subscription(
             String,
@@ -25,8 +28,7 @@ class URMoveItMotion(Node):
             self.transcript_callback,
             10
         )
-        self.set_last_pose = None
-        self.is_running = False
+        
 
         self.straight = ['go straight', 'move forward', 'advance', 'proceed', 'forward', 'straight']
         self.backward = ['go back', 'move back', 'reverse', 'retreat', 'backward']
@@ -38,44 +40,56 @@ class URMoveItMotion(Node):
         self.release = ['release', 'let go', 'drop', 'unclutch']
         self.tcp_rotation_left = ['tcp rotate left', 'tcp turn left', 'tcp spin left', 'tcp twist left']
         self.tcp_rotation_right = ['tcp rotate right', 'tcp turn right', 'tcp spin right', 'tcp twist right']
-
-    def execute_cartesian_path(self, x, y, z, roll, pitch, yaw):
-        current_pose = self.moveit.get_current_pose()
-        target_pose = PoseStamped()
-        if current_pose is None:
-            current_pose = self.moveit.get_current_pose()
-
     
-        target_pose.header.frame_id = 'base_link'
-        target_pose.pose.position.x = current_pose.position.x + x
-        target_pose.pose.position.y = current_pose.position.y + y
-        target_pose.pose.position.z = current_pose.position.z + z
-
-
-        quat = transforms3d.euler.euler2quat(roll, pitch, yaw)
-        target_pose.pose.orientation.x = quat[0]
-        target_pose.pose.orientation.y = quat[1]
-        target_pose.pose.orientation.z = quat[2]
-        target_pose.pose.orientation.w = quat[3]
-
-
-        self.arm.set_start_state_to_current_state()
-        self.arm.set_pose_target(target_pose)
-
-        waypoints = [current_pose, target_pose]
-        (plan, fraction) = self.moveit.compute_cartesian_path(
-            waypoints,
-            0.01, 
-            0.0
-        )
-
-        if fraction > 0.9:
-            planning_result = self.arm.plan(plan, wait=True)
-            trajectory = planning_result.trajectory
-            self.moveit.execute(trajectory)
-            self.get_logger().info("Cartesian path executed successfully")
+    def plan_and_execute(self,
+        robot,
+        planning_component,
+        logger,
+        single_plan_parameters=None,
+        multi_plan_parameters=None,
+        ):
+        """A helper function to plan and execute a motion."""
+        # plan to goal
+        logger.info("Planning trajectory")
+        if multi_plan_parameters is not None:
+                plan_result = planning_component.plan(
+                        multi_plan_parameters=multi_plan_parameters
+                )
+        elif single_plan_parameters is not None:
+                plan_result = planning_component.plan(
+                        single_plan_parameters=single_plan_parameters
+                )
         else:
-            self.get_logger().warn("Cartesian path planning failed")
+                plan_result = planning_component.plan()
+
+        # execute the plan
+        if plan_result:
+                logger.info("Executing plan")
+                robot_trajectory = plan_result.trajectory
+                robot.execute(robot_trajectory, controllers=[])
+        else:
+                logger.error("Planning failed")
+    def execute_cartesian_path(self, x, y, z, rx, ry, rz):
+        current_pose = self.arm.get_current_pose()
+        self.arm.set_start_state_to_current_state()
+
+        target_pose = PoseStamped()
+        target_pose.header.frame_id = 'base_link'
+        target_pose.pose.position.x = current_pose.pose.position.x + x   
+        target_pose.pose.position.y = current_pose.pose.position.y + y   
+        target_pose.pose.position.z = current_pose.pose.position.z + z
+
+        # You need to convert rx, ry, rz into a quaternion if you want to use them for orientation
+        # Here, just assuming they are for orientation change
+        quaternion = transforms3d.euler.euler2quat(rx, ry, rz)  # Assuming rx, ry, rz are Euler angles
+        target_pose.pose.orientation.x = quaternion[0]
+        target_pose.pose.orientation.y = quaternion[1]
+        target_pose.pose.orientation.z = quaternion[2]
+        target_pose.pose.orientation.w = quaternion[3]
+
+        self.arm.set_goal_state(pose_stamped_msg=target_pose, pose_link='end_effector_link')
+
+        self.plan_and_execute(self.moveit, self.arm, self.logger)
 
 
     def go_straight(self):
@@ -91,7 +105,6 @@ class URMoveItMotion(Node):
         self.execute_cartesian_path(0.0, -0.1, 0.0, 0.0, 0.0, 0.0)
 
     def transcript_callback(self, msg):
-
         transcription = msg.data.lower()
         if not transcription.strip():
             self.get_logger().info("Ignoring empty transcription")
@@ -103,7 +116,6 @@ class URMoveItMotion(Node):
             ]
             valid_command_detected = False
             for phrase in command_phrases:
-
                 if phrase in self.straight:
                     self.go_straight()
                     valid_command_detected = True
@@ -118,6 +130,8 @@ class URMoveItMotion(Node):
                     valid_command_detected = True   
                 elif phrase in self.stop:
                     self.arm.stop()
+                    self.gripper.stop()
+                    valid_command_detected = True
 
             if not valid_command_detected:
                 self.arm.stop()
@@ -133,7 +147,23 @@ def main(args=None):
     node = URMoveItMotion()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt and Exception as e:
+    except KeyboardInterrupt:
+        node.get_logger().info("Keyboard interrupt received. Shutting down...")
+    except Exception as e:
+        node.get_logger().error(f"An error occurred: {e}")
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = URMoveItMotion()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        node.get_logger().info("Keyboard interrupt received. Shutting down...")
+    except Exception as e:
         node.get_logger().error(f"An error occurred: {e}")
     finally:
         node.destroy_node()

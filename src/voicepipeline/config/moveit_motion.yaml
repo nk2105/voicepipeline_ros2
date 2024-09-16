@@ -1,0 +1,31 @@
+moveit_motion:
+  ros__parameters:
+    # Robot-related parameters
+    robot_ip: "xxx.yyy.zzz.www"  # Replace with your robot's IP address
+    gripper_type: "robotiq_2f_85"
+    dof: 7  # Degrees of Freedom
+
+    # Cartesian Path Parameters
+    cartesian_path:
+      x: 0.1
+      y: 0.0
+      z: 0.0
+      rx: 0.0
+      ry: 0.0
+      rz: 0.0
+
+    # Command phrases
+    commands:
+      straight: ['go straight', 'move forward', 'advance', 'proceed', 'forward', 'straight']
+      backward: ['go back', 'move back', 'reverse', 'retreat', 'backward']
+      left: ['go left', 'move left', 'turn left', 'left']
+      right: ['go right', 'move right', 'turn right', 'right']
+      stop: ['stop', 'halt', 'cease', 'pause', 'standby']
+      position: ['position', 'pose', 'location', 'place']
+      grip: ['grip', 'grab', 'hold', 'clutch', 'grasp']
+      release: ['release', 'let go', 'drop', 'unclutch']
+      tcp_rotation_left: ['tcp rotate left', 'tcp turn left', 'tcp spin left', 'tcp twist left']
+      tcp_rotation_right: ['tcp rotate right', 'tcp turn right', 'tcp spin right', 'tcp twist right']
+
+    # Logging
+    log_level: "info"  # You can set this to "debug" for more verbose logging
