@@ -15,4 +15,31 @@ Install the following libraries:
 ```plaintext
 whisper
 sounddevice
+```
+
+### 3. Clone the Repository
+
+```plaintext
+git clone https://github.com/nk2105/voicepipeline_ros2.git
+cd voicepipeline_ros2
+```
+
+### 4. Build and source 
+
+```plaintext
+
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### Usage
+
+Launch the pipeline
+
+```plaintext
+
+ros2 launch voicepipeline voicepipeline.launch.py
+
+```
+
 
