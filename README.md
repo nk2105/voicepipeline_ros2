@@ -20,13 +20,14 @@ sounddevice
 ### 3. Clone the Repository
 
 ```plaintext
+cd your_ros2_ws/src
 git clone https://github.com/nk2105/voicepipeline_ros2.git
 ```
 
 ### 4. Build and source 
 
 ```plaintext
-cd voicepipeline_ros2
+cd your_ros2_ws
 colcon build --symlink-install
 source install/setup.bash
 ```
