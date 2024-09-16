@@ -21,13 +21,12 @@ sounddevice
 
 ```plaintext
 git clone https://github.com/nk2105/voicepipeline_ros2.git
-cd voicepipeline_ros2
 ```
 
 ### 4. Build and source 
 
 ```plaintext
-
+cd voicepipeline_ros2
 colcon build --symlink-install
 source install/setup.bash
 ```
@@ -37,9 +36,7 @@ source install/setup.bash
 Launch the pipeline
 
 ```plaintext
-
 ros2 launch voicepipeline voicepipeline.launch.py
-
 ```
 
 
