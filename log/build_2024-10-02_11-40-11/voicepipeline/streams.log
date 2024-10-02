@@ -1,0 +1,41 @@
+[2.046s] Invoking command in '/home/guts/voicepipeline_ros2/build/voicepipeline': PYTHONPATH=/home/guts/voicepipeline_ros2/build/voicepipeline/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/guts/voicepipeline_ros2/install/voicepipeline/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/guts/voicepipeline_ros2/build/voicepipeline/build --no-deps symlink_data
+[3.058s] running develop
+[3.059s] /home/guts/.local/lib/python3.10/site-packages/setuptools/command/develop.py:39: EasyInstallDeprecationWarning: easy_install command is deprecated.
+[3.059s] !!
+[3.059s] 
+[3.059s]         ********************************************************************************
+[3.059s]         Please avoid running ``setup.py`` and ``easy_install``.
+[3.059s]         Instead, use pypa/build, pypa/installer or other
+[3.060s]         standards-based tools.
+[3.060s] 
+[3.060s]         See https://github.com/pypa/setuptools/issues/917 for details.
+[3.060s]         ********************************************************************************
+[3.060s] 
+[3.060s] !!
+[3.061s]   easy_install.initialize_options(self)
+[3.948s] running egg_info
+[3.948s] creating voicepipeline.egg-info
+[4.029s] writing voicepipeline.egg-info/PKG-INFO
+[4.030s] writing dependency_links to voicepipeline.egg-info/dependency_links.txt
+[4.030s] writing entry points to voicepipeline.egg-info/entry_points.txt
+[4.030s] writing requirements to voicepipeline.egg-info/requires.txt
+[4.031s] writing top-level names to voicepipeline.egg-info/top_level.txt
+[4.031s] writing manifest file 'voicepipeline.egg-info/SOURCES.txt'
+[4.147s] reading manifest file 'voicepipeline.egg-info/SOURCES.txt'
+[4.149s] writing manifest file 'voicepipeline.egg-info/SOURCES.txt'
+[4.318s] running build_ext
+[4.318s] Creating /home/guts/voicepipeline_ros2/install/voicepipeline/lib/python3.10/site-packages/voicepipeline.egg-link (link to .)
+[4.319s] Installing commander script to /home/guts/voicepipeline_ros2/install/voicepipeline/lib/voicepipeline
+[4.320s] Installing commander_gpt script to /home/guts/voicepipeline_ros2/install/voicepipeline/lib/voicepipeline
+[4.320s] Installing moveit_motion script to /home/guts/voicepipeline_ros2/install/voicepipeline/lib/voicepipeline
+[4.320s] Installing spot_commander script to /home/guts/voicepipeline_ros2/install/voicepipeline/lib/voicepipeline
+[4.321s] Installing transcriber script to /home/guts/voicepipeline_ros2/install/voicepipeline/lib/voicepipeline
+[4.321s] 
+[4.321s] Installed /home/guts/voicepipeline_ros2/build/voicepipeline
+[4.321s] running symlink_data
+[4.322s] symbolically linking /home/guts/voicepipeline_ros2/build/voicepipeline/package.xml -> /home/guts/voicepipeline_ros2/install/voicepipeline/share/voicepipeline
+[4.322s] creating /home/guts/voicepipeline_ros2/install/voicepipeline/share/voicepipeline/config
+[4.322s] creating /home/guts/voicepipeline_ros2/install/voicepipeline/share/voicepipeline/launch
+[4.322s] symbolically linking /home/guts/voicepipeline_ros2/build/voicepipeline/launch/voicepipeline.launch.py -> /home/guts/voicepipeline_ros2/install/voicepipeline/share/voicepipeline/launch
+[4.323s] creating /home/guts/voicepipeline_ros2/install/voicepipeline/share/voicepipeline/srdf
+[4.398s] Invoked command in '/home/guts/voicepipeline_ros2/build/voicepipeline' returned '0': PYTHONPATH=/home/guts/voicepipeline_ros2/build/voicepipeline/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/guts/voicepipeline_ros2/install/voicepipeline/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/guts/voicepipeline_ros2/build/voicepipeline/build --no-deps symlink_data

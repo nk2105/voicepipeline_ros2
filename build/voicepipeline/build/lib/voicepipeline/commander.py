@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from spot_msgs.srv import SetLocomotion
 from std_srvs.srv import Trigger
-import re
+from word2number import w2n
 
 class Commander(Node):
     def __init__(self):
@@ -124,7 +122,7 @@ class Commander(Node):
         self.req.mode = mode
         self.future = self.set_locomotion_client.call_async(self.req)
 
-    def do_pushups(self, number):
+    def do_pushups(self):
         while not self.stand_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting again...')
         
@@ -132,14 +130,16 @@ class Commander(Node):
             self.get_logger().info('Service not available, waiting again...')
 
         self.req = Trigger.Request()
-        self.pushup_timer = self.create_timer(2.0, lambda: self.pushup_callback(number))
+        self.pushup_timer = self.create_timer(2.0, self.pushup_callback)
 
-    def pushup_callback(self, number):
+    def pushup_callback(self):
 
         if not hasattr(self, 'pushup_count'):
             self.pushup_count = 0
-            self.total_pushups = 2 * number
-            
+            if self.number:
+                self.total_pushups = 2*self.number
+            else:
+                self.total_pushups = 5
             self.get_logger().info(f"Doing {self.total_pushups} pushups")
 
         if self.pushup_count < self.total_pushups:
@@ -189,8 +189,8 @@ class Commander(Node):
         command_phrases = [
             phrase.strip().rstrip('.').rstrip(',').rstrip('!').rstrip('?') for phrase in transcription.split(',')
         ]
-        numbers = re.findall(r'\d+', transcription)
-        number = int(numbers[0]) if numbers else 0
+
+        self.number = w2n.word_to_num(command_phrases[0])
         
         for phrase in command_phrases:
             if phrase in self.straight:
@@ -232,8 +232,8 @@ class Commander(Node):
             elif phrase in self.right_self:
                 self.self_right()
                 break
-            elif number and any(pushup_cmd in phrase for pushup_cmd in self.pushups):
-                self.do_pushups(number)
+            elif phrase in self.pushups:
+                self.do_pushups()
                 break
 
             else:
