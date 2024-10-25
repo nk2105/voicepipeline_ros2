@@ -7,6 +7,7 @@ from std_msgs.msg import String
 from spot_msgs.srv import SetLocomotion
 from std_srvs.srv import Trigger
 import re
+import time
 
 class Commander(Node):
     def __init__(self):
@@ -25,7 +26,7 @@ class Commander(Node):
         self.twist_command = Twist()
         self.last_command = None
         self.speed = 0.5  # Initial speed
-        self.turn = 1.0   # Initial turning speed
+        self.turn = 0.5   # Initial turning speed
         self.max_speed = 2.0
         self.min_speed = 0.1
 
@@ -247,6 +248,15 @@ class Commander(Node):
         self.timeout_timer.cancel()
         self.timeout_timer = self.create_timer(self.timeout_duration, self.stop_on_timeout)
 
+    def destroy_node(self):
+        """Gracefully shuts down the commander node."""
+        if rclpy.ok():  # Check if ROS is still running
+            self.get_logger().info("Shutting down commander node.")
+            self.stop_movement()  # Stop the robot before shutdown
+            time.sleep(1)  # Wait for the robot to stop moving
+        super().destroy_node()
+
+
 def main(args=None):
     rclpy.init(args=args)
     commander = Commander()
@@ -256,7 +266,8 @@ def main(args=None):
         pass
     finally:
         commander.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

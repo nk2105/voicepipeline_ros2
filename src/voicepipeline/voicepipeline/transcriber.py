@@ -1,5 +1,3 @@
-# FROM https://github.com/Nikorasu/LiveWhisper
-
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
@@ -20,7 +18,7 @@ Translate = False   # Translate non-English to English?
 SampleRate = 44100  # Stream device recording frequency
 BlockSize = 30      # Block size in milliseconds
 Threshold = 0.1     # Minimum volume threshold to activate listening
-Vocals = [50, 1000] # Frequency range to detect sounds that could be speech
+Vocals = [125, 1000] # Frequency range to detect sounds that could be speech
 EndBlocks = 40      # Number of blocks to wait before sending to Whisper
 
 class Transcriber(Node):
@@ -78,7 +76,7 @@ class Transcriber(Node):
             msg = String()
             msg.data = result['text']
             
-            print(f"\033[1A\033[2K\033[0G{result['text']}")
+            print(f"You said: {result['text']}")
             self.transcription_publisher.publish(msg)  # Publish the String message
             
             if self.asst.analyze is not None:
@@ -103,6 +101,12 @@ class Transcriber(Node):
             # Process audio while the node is running
             while self.running and self.asst.running:
                 self.process()
+
+    def destroy_node(self):
+        """Gracefully shuts down the transcriber node."""
+        print("\033[93mShutting down transcriber node.\033[0m")
+        self.running = False
+        super().destroy_node()
         
 def main(args=None):
     rclpy.init(args=args)
@@ -111,7 +115,6 @@ def main(args=None):
     executor = MultiThreadedExecutor(num_threads=4)
     executor.add_node(transcriber)
     
-    # Start listening in a separate thread
     listen_thread = threading.Thread(target=transcriber.listen)
     listen_thread.start()
 
@@ -120,13 +123,17 @@ def main(args=None):
     except (KeyboardInterrupt, SystemExit):
         pass
     finally:
-        transcriber.running = False  # Signal the listen method to stop
-        listen_thread.join()  # Wait for the listen thread to finish
+        # Only set running to False if it's still True
+        if transcriber.running:
+            transcriber.running = False
+        listen_thread.join()
         transcriber.destroy_node()
-        rclpy.shutdown()
-        print("\n\033[93mQuitting..\033[0m")
-        if os.path.exists('dictate.wav'):
-            os.remove('dictate.wav')
+        
+        # Ensure shutdown is called only once
+        if rclpy.ok():
+            rclpy.shutdown()
+            print("\n\033[93mQuitting..\033[0m")
+
 
 if __name__ == '__main__':
     main()  
